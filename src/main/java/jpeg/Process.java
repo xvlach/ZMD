@@ -2,6 +2,7 @@ package jpeg;
 import Jama.Matrix;
 import core.Helper;
 import enums.ColorType;
+import enums.QualityType;
 import enums.SamplingType;
 import enums.TransformType;
 import graphics.Dialogs;
@@ -23,6 +24,8 @@ public class Process {
     private Matrix originalY, modifiedY;
     private Matrix originalCb, modifiedCb;
     private Matrix originalCr, modifiedCr;
+
+    public double mse, sae, mae, psnr, ssim, mssim;
 
 
     /**
@@ -138,7 +141,7 @@ public class Process {
      */
     public void convertToRGB()
     {
-        int[][][] pom = ColorTransform.convertModifiedYcBcRtoRGB(originalY, originalCb, originalCr);
+        int[][][] pom = ColorTransform.convertModifiedYcBcRtoRGB(modifiedY, modifiedCb, modifiedCr);
         modifiedRed = pom[0];
         modifiedGreen = pom[1];
         modifiedBlue = pom[2];
@@ -176,7 +179,7 @@ public class Process {
         modifiedCr = Sampling.sampleUp(modifiedCr, samplingType);
     }
 
-    public BufferedImage showOrigBlue()
+    public BufferedImage showoriginalBlue()
     {
         return showOneColorImageFromRGB(originalBlue, BLUE);
     }
@@ -224,5 +227,100 @@ public class Process {
     {
         return  showOneColorImageFromYCbCr(modifiedCr);
     }
+
+    public void count(QualityType qualityType) {
+        double mseRed = 0, mseBlue = 0, mseGreen = 0, maeRed = 0, maeBlue = 0, maeGreen = 0, saeRed = 0, saeBlue = 0, saeGreen = 0, mseY = 0, maeY = 0, saeY = 0, mseCb = 0, maeCb = 0, saeCb = 0, mseCr = 0, maeCr = 0, saeCr = 0, ssimY = 0, ssimCb = 0, ssimCr = 0, mssimY = 0, mssimCb = 0, mssimCr = 0;
+
+        if (qualityType == QualityType.RGB || qualityType == QualityType.Red || qualityType == QualityType.Green || qualityType == QualityType.Blue) {
+            mseRed = Quality.countMSE(Helper.convertIntToDouble(originalRed), Helper.convertIntToDouble(modifiedRed));
+            mseBlue = Quality.countMSE(Helper.convertIntToDouble(originalBlue), Helper.convertIntToDouble(modifiedBlue));
+            mseGreen = Quality.countMSE(Helper.convertIntToDouble(originalGreen), Helper.convertIntToDouble(modifiedGreen));
+
+            maeRed = Quality.countMAE(Helper.convertIntToDouble(originalRed), Helper.convertIntToDouble(modifiedRed));
+            maeBlue = Quality.countMAE(Helper.convertIntToDouble(originalBlue), Helper.convertIntToDouble(modifiedBlue));
+            maeGreen = Quality.countMAE(Helper.convertIntToDouble(originalGreen), Helper.convertIntToDouble(modifiedGreen));
+
+            saeRed = Quality.countSAE(Helper.convertIntToDouble(originalRed), Helper.convertIntToDouble(modifiedRed));
+            saeBlue = Quality.countSAE(Helper.convertIntToDouble(originalBlue), Helper.convertIntToDouble(modifiedBlue));
+            saeGreen = Quality.countSAE(Helper.convertIntToDouble(originalGreen), Helper.convertIntToDouble(modifiedGreen));
+        } else
+            if (qualityType.equals(QualityType.YCbCr) || qualityType.equals(QualityType.Y) || qualityType.equals(QualityType.Cb) || qualityType.equals(QualityType.Cr)) {
+                mseY = Quality.countMSE(originalY.getArray(), modifiedY.getArray());
+                maeY = Quality.countMAE(originalY.getArray(), modifiedY.getArray());
+                saeY = Quality.countSAE(originalY.getArray(), modifiedY.getArray());
+                ssimY = Quality.countSSIM(originalY.getArray(), modifiedY.getArray());
+                mssimY = Quality.countMSSIM(originalY.getArray(), modifiedY.getArray());
+
+                mseCb = Quality.countMSE(originalCb.getArray(), modifiedCb.getArray());
+                maeCb = Quality.countMAE(originalCb.getArray(), modifiedCb.getArray());
+                saeCb = Quality.countSAE(originalCb.getArray(), modifiedCb.getArray());
+                ssimCb = Quality.countSSIM(originalCb.getArray(), modifiedCb.getArray());
+                mssimCb = Quality.countMSSIM(originalCb.getArray(), modifiedCb.getArray());
+
+                mseCr = Quality.countMSE(originalCr.getArray(), modifiedCr.getArray());
+                maeCr = Quality.countMAE(originalCr.getArray(), modifiedCr.getArray());
+                saeCr = Quality.countSAE(originalCr.getArray(), modifiedCr.getArray());
+                ssimCr = Quality.countSSIM(originalCr.getArray(), modifiedCr.getArray());
+                mssimCr = Quality.countMSSIM(originalCr.getArray(), modifiedCr.getArray());
+        }
+
+        switch (qualityType){
+            case Y:
+                mse = mseY;
+                mae = maeY;
+                sae = saeY;
+                psnr = Quality.countPSNR(mse);
+                ssim = ssimY;
+                mssim = mssimY;
+                break;
+            case Cb:
+                mse = mseCb;
+                mae = maeCb;
+                sae = saeCb;
+                psnr = Quality.countPSNR(mse);
+                ssim = ssimCb;
+                mssim = mssimCb;
+                break;
+            case Cr:
+                mse = mseCr;
+                mae = maeCr;
+                sae = saeCr;
+                psnr = Quality.countPSNR(mse);
+                ssim = ssimCr;
+                mssim = mssimCr;
+                break;
+            case Red:
+                mse = mseRed;
+                mae = maeRed;
+                sae = saeRed;
+                psnr = Quality.countPSNR(mse);
+                break;
+            case Blue:
+                mse = mseBlue;
+                mae = maeBlue;
+                sae = saeBlue;
+                psnr = Quality.countPSNR(mse);
+                break;
+            case Green:
+                mae = maeGreen;
+                sae = saeGreen;
+                psnr = Quality.countPSNR(mse);
+                break;
+            case RGB:
+                mse = (mseRed + mseBlue + mseGreen) / 3;
+                mae = (maeRed + maeBlue + maeGreen) / 3;
+                sae = (saeRed + saeBlue + saeGreen) / 3;
+                psnr = Quality.countPSNRforRGB(mseRed, mseBlue, saeBlue);
+                break;
+
+            case YCbCr:
+                mse = (mseY + mseCb + mseCr) / 3;
+                mae = (maeY + maeCb + maeCr) / 3;
+                sae = (saeY + saeCb + saeCr) / 3;
+                psnr = Quality.countPSNR(mse);
+                break;
+        }
+    }
+
 
 }

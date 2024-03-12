@@ -72,4 +72,20 @@ public class Helper {
         if (w > 255) w = 255;
         return w;
     }
+
+    /**
+     * Převod int pole na double pole
+     *
+     * @param intArray
+     * @return double arr
+     */
+    public static double[][] convertIntToDouble(int[][] intArray) {
+        double[][] doubleArray = new double[intArray.length][intArray[0].length];
+        for (int i = 0; i < intArray.length; i++) {
+            for (int j = 0; j < intArray[0].length; j++) {
+                doubleArray[i][j] = intArray[i][j];
+            }
+        }
+        return doubleArray;
+    }
 }

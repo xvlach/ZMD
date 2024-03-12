@@ -2,10 +2,12 @@ package graphics;
 
 import core.FileBindings;
 import core.Helper;
+import enums.QualityType;
 import enums.SamplingType;
 import enums.TransformType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -20,42 +22,122 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.security.PrivateKey;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
 public class MainWindowController implements Initializable {
 
     @FXML
-    Button buttonInverseQuantize;
+    private TextField MAE;
+
     @FXML
-    Button buttonInverseToRGB;
+    private TextField MSE;
+
     @FXML
-    Button buttonInverseSample;
+    private TextField MSSIM;
+
     @FXML
-    Button buttonInverseTransform;
+    private TextField PSNR;
+
     @FXML
-    Button buttonQuantize;
+    private TextField SAE;
+
+    @FXML
+    private TextField SSIM;
+
+    @FXML
+    private Button buttonBlue;
+
+    @FXML
+    private Button buttonBlue2;
+
+    @FXML
+    private Button buttonCb;
+
+    @FXML
+    private Button buttonCb2;
+
+    @FXML
+    private Button buttonCountPSNR;
+
+    @FXML
+    private Button buttonCountSSIM;
+
+    @FXML
+    private Button buttonCr;
+
+    @FXML
+    private Button buttonCr2;
+
+    @FXML
+    private Button buttonDownSample;
+
+    @FXML
+    private Button buttonGreen;
+
+    @FXML
+    private Button buttonGreen2;
+
+    @FXML
+    private Button buttonIQuantize;
+
+    @FXML
+    private Button buttonITransform;
+
+    @FXML
+    private Button buttonOverSample;
+
+    @FXML
+    private Button buttonQuantize;
+
+    @FXML
+    private Button buttonRGB;
+
+    @FXML
+    private Button buttonRGBtoYCbCr;
+
+    @FXML
+    private Button buttonRed;
+
+    @FXML
+    private Button buttonRed2;
+
+    @FXML
+    private Button buttonShowImage;
+
+    @FXML
+    private Button buttonTransform;
+
+    @FXML
+    private Button buttonY;
+
+    @FXML
+    private Button buttonY2;
+
+    @FXML
+    private Button buttonYCbCrtoRGB;
+
+    @FXML
+    private CheckBox checkboxShadow;
+
+    @FXML
+    private CheckBox checkboxSteps;
+
+    @FXML
+    private ComboBox<QualityType> comboboxPSNR;
+
+    @FXML
+    private ComboBox<QualityType> comboboxSSIM;
+
+    @FXML
+    private Slider quantizeQuality;
+
+    @FXML
+    private TextField quantizeQualityField;
+
     @FXML
     Button buttonSample;
-    @FXML
-    Button buttonToYCbCr;
-    @FXML
-    Button buttonTransform;
-
-    @FXML
-    TextField qualityMSE;
-    @FXML
-    TextField qualityPSNR;
-
-    @FXML
-    Slider quantizeQuality;
-    @FXML
-    TextField quantizeQualityField;
-
-    @FXML
-    CheckBox shadesOfGrey;
-    @FXML
-    CheckBox showSteps;
 
     @FXML
     Spinner<Integer> transformBlock;
@@ -74,10 +156,15 @@ public class MainWindowController implements Initializable {
         // Nastavení všech hodnot do combo boxů
         sampling.getItems().setAll(SamplingType.values());
         transformType.getItems().setAll(TransformType.values());
+        comboboxPSNR.getItems().setAll(QualityType.values());
+        comboboxSSIM.getItems().setAll(QualityType.Y,QualityType.Cb,QualityType.Cr);
 
         // Nastavení výchozích hodnot
         sampling.getSelectionModel().select(SamplingType.S_4_4_4);
         transformType.getSelectionModel().select(TransformType.DCT);
+        comboboxPSNR.getSelectionModel().select(QualityType.Red);
+        comboboxSSIM.getSelectionModel().select(QualityType.Y);
+
         quantizeQuality.setValue(50);
 
         // Vytvoření listu možností, které budou uvnitř spinneru
@@ -105,13 +192,13 @@ public class MainWindowController implements Initializable {
     /**
      * Zavření okna.
      */
-    public void close() {
+    @FXML
+    public void close(ActionEvent event) {
         Stage stage = ((Stage) buttonSample.getScene().getWindow());
         stage.fireEvent(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
-    /**
-     *
-     */
+
+    @FXML
     public void closeWindows() {
         Dialogs.closeAllWindows();
     }
@@ -119,7 +206,8 @@ public class MainWindowController implements Initializable {
     /**
      * Zobrazení originálního obrázku
      */
-    public void showOriginal() {
+    @FXML
+    public void showOriginal(ActionEvent event) {
         File f = new File(FileBindings.defaultImage);
         try {
             Dialogs.showImageInWindow(ImageIO.read(f), "Original", true);
@@ -131,19 +219,22 @@ public class MainWindowController implements Initializable {
     /**
      * TBD změna obrázku
      */
-    public void changeImage() {
+    @FXML
+    public void changeImage(ActionEvent event) {
     }
 
     /**
      * TBD zrušení změn
      */
-    public void reset() {
+    @FXML
+    public void reset(ActionEvent event) {
     }
 
     /**
      * Zobrazení upraveného RGB obrázku
      */
-    public void showRGBModified() {
+    @FXML
+    public void showRGBModified(ActionEvent event) {
         try {
             Dialogs.showImageInWindow(process.getImageFromRGB(), "Modified RGB", true);
         } catch (Exception e) {
@@ -154,7 +245,8 @@ public class MainWindowController implements Initializable {
     /**
      * Převod z grayscale do RBG
      */
-    public void convertToRGB() {
+    @FXML
+    public void convertToRGB(ActionEvent event) {
         try {
             process.convertToRGB();
         } catch (Exception e) {
@@ -166,7 +258,8 @@ public class MainWindowController implements Initializable {
     /**
      * Převod z RGB do grayscale
      */
-    public void convertToYCbCr() {
+    @FXML
+    public void convertToYCbCr(ActionEvent event) {
         try {
             process.convertToYCbCr();
         } catch (Exception e) {
@@ -174,7 +267,8 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    public void sample() {
+    @FXML
+    public void sample(ActionEvent event) {
         try {
             process.sampleDown(sampling.getValue());
         } catch (Exception e) {
@@ -182,7 +276,8 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    public void inverseSample() {
+    @FXML
+    public void inverseSample(ActionEvent event) {
         try {
             process.sampleUp(sampling.getValue());
         } catch (Exception e) {
@@ -191,30 +286,31 @@ public class MainWindowController implements Initializable {
 
     }
 
-    public void transform() {
+    @FXML
+    public void transform(ActionEvent event) {
 
     }
 
-    public void inverseTransform() {
+    @FXML
+    public void inverseTransform(ActionEvent event) {
 
     }
 
-    public void quantize() {
+    @FXML
+    public void quantize(ActionEvent event) {
 
     }
 
-    public void inverseQuantize() {
-
-    }
-
-    public void countQuality() {
+    @FXML
+    public void inverseQuantize(ActionEvent event) {
 
     }
 
     /**
      * Zobrazení modré složky modifikovaného RGB obrázku
      */
-    public void showBlueModified() {
+    @FXML
+    public void showBlueModified(ActionEvent event) {
         try {
             Dialogs.showImageInWindow(process.showModifBlue(), "Modified Blue", true);
         } catch (Exception e) {
@@ -224,112 +320,148 @@ public class MainWindowController implements Initializable {
     /**
      * Zobrazení modré složky originálního RGB obrázku
      */
-    public void showBlueOriginal() {
+    @FXML
+    public void showBlueOriginal(ActionEvent event) {
         try {
-            Dialogs.showImageInWindow(process.showOrigBlue(), "Original Blue", true);
+            Dialogs.showImageInWindow(process.showoriginalBlue(), "Original Blue", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Zobrazení Cb složky modifikovaného YCbCr obrázku
      */
-    public void showCbModified() {
+    @FXML
+    public void showCbModified(ActionEvent event) {
         try {
             Dialogs.showImageInWindow(process.showModifCb(), "Modified Cb", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Zobrazení Cb složky originálního YCbCr obrázku
      */
-    public void showCbOriginal() {
+    @FXML
+    public void showCbOriginal(ActionEvent event) {
         try {
-            Dialogs.showImageInWindow(process.showOrigCb(), "Original Cb", true);
+            Dialogs.showImageInWindow(process.showOrigY(), "Original Cb", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Zobrazení Cr složky modifikovaného YCbCr obrázku
      */
-    public void showCrModified() {
+    @FXML
+    public void showCrModified(ActionEvent event) {
         try {
             Dialogs.showImageInWindow(process.showModifCr(), "Modified Cr", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Zobrazení Cr složky originálního YCbCr obrázku
      */
-    public void showCrOriginal() {
+    @FXML
+    public void showCrOriginal(ActionEvent event) {
         try {
             Dialogs.showImageInWindow(process.showOrigCr(), "Original Cr", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Zobrazení zelené složky modifikovaného RGB obrázku
      */
-    public void showGreenModified() {
+    @FXML
+    public void showGreenModified(ActionEvent event) {
         try {
             Dialogs.showImageInWindow(process.showModifGreen(), "Modified Green", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Zobrazení zelené složky originálního RGB obrázku
      */
-    public void showGreenOriginal() {
+    @FXML
+    public void showGreenOriginal(ActionEvent event) {
         try {
             Dialogs.showImageInWindow(process.showOrigGreen(), "Original Green", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Zobrazení červené složky modifikovaného RGB obrázku
      */
-    public void showRedModified() {
+    @FXML
+    public void showRedModified(ActionEvent event) {
         try {
             Dialogs.showImageInWindow(process.showModifRed(), "Modified Red", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Zobrazení červené složky originálního RGB obrázku
      */
-    public void showRedOriginal() {
+    @FXML
+    public void showRedOriginal(ActionEvent event) {
         try {
             Dialogs.showImageInWindow(process.showOrigRed(), "Original Red", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Zobrazení Y složky modifikovaného YCbCr obrázku
      */
-    public void showYModified() {
+    @FXML
+    public void showYModified(ActionEvent event) {
         try {
             Dialogs.showImageInWindow(process.showModifY(), "Modified Y", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Zobrazení Y složky originálního YCbCr obrázku
      */
-    public void showYOriginal() {
+    @FXML
+    public void showYOriginal(ActionEvent event) {
         try {
             Dialogs.showImageInWindow(process.showOrigY(), "Original Y", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-}
 
+    @FXML
+    public void countPSNR(ActionEvent event) {
+        process.count(comboboxPSNR.getValue());
+        MSE.textProperty().set(String.format("%.4f", process.mse));
+        MAE.textProperty().set(String.format("%.4f", process.mae));
+        SAE.textProperty().set(String.format("%.4f", process.sae));
+        PSNR.textProperty().set(String.format("%.4f", process.psnr));
+    }
+
+    @FXML
+    public void countSSIM(ActionEvent event) {
+        process.count(comboboxSSIM.getValue());
+        SSIM.textProperty().set(String.format("%.4f", process.ssim));
+        MSSIM.textProperty().set(String.format("%.4f", process.mssim));
+    }
+}

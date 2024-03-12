@@ -25,7 +25,7 @@ public class JFXMain extends Application {
         mainScene = new Scene(root); //Vytvoření scény z fxml souboru
         primaryStage.setScene(mainScene); //Vložení scény do okna
 
-        primaryStage.setTitle("JPEG: Student"); //SEM SI NAPIŠ SVOJE JMÉNO
+        primaryStage.setTitle("JPEG: xvlach23"); //SEM SI NAPIŠ SVOJE JMÉNO
         primaryStage.getIcons().add(FileBindings.favicon); //Přidání ikony aplikace
         primaryStage.show(); //Zobrazí rozhraní
 
