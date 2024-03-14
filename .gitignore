@@ -1,0 +1,13 @@
+
+target/classes/enums/Operations.class
+target/classes/enums/QualityType.class
+target/classes/graphics/MainWindowController.class
+target/classes/jpeg/Process.class
+target/classes/jpeg/Quality$1.class
+target/classes/jpeg/Quality.class
+target/classes/jpeg/Transform$1.class
+target/classes/jpeg/Transform.class
+target/test-classes/QualityTest.class
+target/test-classes/TransformTest.class
+target/classes/graphics/MainWindowController.class
+target/classes/jpeg/Process.class

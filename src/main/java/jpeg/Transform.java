@@ -6,29 +6,11 @@ import enums.TransformType;
 public class Transform {
 
     public static Matrix transform (Matrix input, TransformType type, int blockSize) {
-        Matrix returnMatrix = new Matrix(input.getRowDimension(), input.getColumnDimension());
-        Matrix A = getTransformMatrix(type, blockSize);
-        Matrix At = A.transpose();
-        for (int row = 0; row < input.getRowDimension(); row += blockSize) {
-            for (int col = 0; col < input.getColumnDimension(); col += blockSize) {
-                Matrix block = input.getMatrix(row,row + blockSize - 1, col, col + blockSize -1);
-                returnMatrix.setMatrix(row,row + blockSize - 1, col, col + blockSize -1,A.times(block).times(At));
-            }
-        }
-        return returnMatrix;
+        return helperMethodMatrixOperations(input, type, blockSize, false);
     }
 
     public static Matrix inverseTransform (Matrix input, TransformType type, int blockSize) {
-        Matrix returnMatrix = new Matrix(input.getRowDimension(), input.getColumnDimension());
-        Matrix A = getTransformMatrix(type, blockSize);
-        Matrix At = A.transpose();
-        for (int row = 0; row < input.getRowDimension(); row += blockSize) {
-            for (int col = 0; col < input.getColumnDimension(); col += blockSize) {
-                Matrix block = input.getMatrix(row,row + blockSize - 1, col, col + blockSize -1);
-                returnMatrix.setMatrix(row,row + blockSize - 1, col, col + blockSize -1,At.times(block).times(A));
-            }
-        }
-        return returnMatrix;
+        return helperMethodMatrixOperations(input, type, blockSize, true);
     }
 
     public static Matrix getTransformMatrix (TransformType type, int blockSize) {
@@ -67,5 +49,21 @@ public class Transform {
         newMatrix.setMatrix(num / 2,num -1,num / 2,num-1, matrix.uminus());
         return newMatrix;
     }
-}
 
+    public static Matrix helperMethodMatrixOperations (Matrix input, TransformType type, int blockSize, boolean inverse) {
+        Matrix returnMatrix = new Matrix(input.getRowDimension(), input.getColumnDimension());
+        Matrix A = getTransformMatrix(type, blockSize);
+        Matrix At = A.transpose();
+        for (int row = 0; row < input.getRowDimension(); row += blockSize) {
+            for (int col = 0; col < input.getColumnDimension(); col += blockSize) {
+                Matrix block = input.getMatrix(row,row + blockSize - 1, col, col + blockSize -1);
+                if (inverse) {
+                    returnMatrix.setMatrix(row,row + blockSize - 1, col, col + blockSize -1,At.times(block).times(A));
+                } else {
+                    returnMatrix.setMatrix(row,row + blockSize - 1, col, col + blockSize -1,A.times(block).times(At));
+                }
+            }
+        }
+        return returnMatrix;
+    }
+}
