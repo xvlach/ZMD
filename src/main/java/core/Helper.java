@@ -88,4 +88,8 @@ public class Helper {
         }
         return doubleArray;
     }
+
+    public static int roundRange(double num) {
+        return Math.min(Math.max((int) Math.round(num), 0), 255);
+    }
 }

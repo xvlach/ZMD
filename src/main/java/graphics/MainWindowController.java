@@ -288,13 +288,12 @@ public class MainWindowController implements Initializable {
 
     @FXML
     public void transform(ActionEvent event) {
-        
-
+        process.transform(transformType.getValue(), transformBlock.getValue());
     }
 
     @FXML
     public void inverseTransform(ActionEvent event) {
-
+        process.inversionTransform(transformType.getValue(), transformBlock.getValue());
     }
 
     @FXML

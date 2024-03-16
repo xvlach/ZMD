@@ -128,9 +128,9 @@ public class Process {
         for(int h = 0; h < height; h++){
             for (int w = 0; w < width; w++) {
                 bfImage.setRGB(w,h,
-                        (new Color((int)color.get(h,w),
-                                (int)color.get(h,w),
-                                (int)color.get(h,w)).getRGB()));
+                        (new Color(Helper.roundRange(color.get(h,w)),
+                                Helper.roundRange(color.get(h,w)) ,
+                                Helper.roundRange(color.get(h,w))).getRGB()));
             }
         }
         return bfImage;
@@ -320,5 +320,17 @@ public class Process {
                 psnr = Quality.countPSNR(mse);
                 break;
         }
+    }
+
+    public void transform (TransformType transformType, int blockSize) {
+        modifiedY = Transform.transform(modifiedY, transformType, blockSize);
+        modifiedCb = Transform.transform(modifiedCb, transformType, blockSize);
+        modifiedCr = Transform.transform(modifiedCr, transformType, blockSize);
+    }
+
+    public void inversionTransform (TransformType transformType, int blockSize) {
+        modifiedY = Transform.inverseTransform(modifiedY, transformType, blockSize);
+        modifiedCb = Transform.inverseTransform(modifiedCb, transformType, blockSize);
+        modifiedCr = Transform.inverseTransform(modifiedCr, transformType, blockSize);
     }
 }

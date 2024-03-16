@@ -11,3 +11,6 @@ target/test-classes/QualityTest.class
 target/test-classes/TransformTest.class
 target/classes/graphics/MainWindowController.class
 target/classes/jpeg/Process.class
+target/classes/core/Helper.class
+target/classes/graphics/MainWindowController.class
+target/classes/jpeg/Process.class
