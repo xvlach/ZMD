@@ -76,7 +76,7 @@ public class Helper {
     /**
      * Převod int pole na double pole
      *
-     * @param intArray
+     * @param intArray to convert
      * @return double arr
      */
     public static double[][] convertIntToDouble(int[][] intArray) {
@@ -87,6 +87,22 @@ public class Helper {
             }
         }
         return doubleArray;
+    }
+
+    /**
+     * Převod int pole na double pole
+     *
+     * @param doubleArray to convert
+     * @return double arr
+     */
+    public static int[][] convertDoubleToInt(double[][] doubleArray) {
+        int [][] intArray = new int[doubleArray.length][doubleArray[0].length];
+        for (int i = 0; i < doubleArray.length; i++) {
+            for (int j = 0; j < doubleArray[0].length; j++) {
+                intArray[i][j] = (int) doubleArray[i][j];
+            }
+        }
+        return intArray;
     }
 
     public static int roundRange(double num) {

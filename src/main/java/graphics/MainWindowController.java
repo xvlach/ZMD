@@ -298,12 +298,12 @@ public class MainWindowController implements Initializable {
 
     @FXML
     public void quantize(ActionEvent event) {
-
+        process.quantize(quantizeQuality.getValue(), transformBlock.getValue());
     }
 
     @FXML
     public void inverseQuantize(ActionEvent event) {
-
+        process.inverseQuantize(quantizeQuality.getValue(), transformBlock.getValue());
     }
 
     /**

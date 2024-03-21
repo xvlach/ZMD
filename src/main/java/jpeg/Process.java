@@ -159,6 +159,10 @@ public class Process {
         modifiedY = originalY;
         modifiedCb = originalCb;
         modifiedCr = originalCr;
+
+        modifiedRed = originalRed;
+        modifiedBlue = originalBlue;
+        modifiedGreen = originalGreen;
     }
 
     /**
@@ -334,5 +338,23 @@ public class Process {
         modifiedY = Transform.inverseTransform(modifiedY, transformType, blockSize);
         modifiedCb = Transform.inverseTransform(modifiedCb, transformType, blockSize);
         modifiedCr = Transform.inverseTransform(modifiedCr, transformType, blockSize);
+    }
+
+    public void quantize (double quantize, int blockSize){
+        modifiedRed = Helper.convertDoubleToInt(Quantization.quantize(Matrix.constructWithCopy(Helper.convertIntToDouble(modifiedRed)), blockSize, quantize,false).getArray());
+        modifiedBlue = Helper.convertDoubleToInt(Quantization.quantize(Matrix.constructWithCopy(Helper.convertIntToDouble(modifiedBlue)), blockSize, quantize,false).getArray());
+        modifiedGreen = Helper.convertDoubleToInt(Quantization.quantize(Matrix.constructWithCopy(Helper.convertIntToDouble(modifiedGreen)), blockSize, quantize,false).getArray());
+
+        modifiedCb = Quantization.quantize(modifiedCb, blockSize, quantize, true);
+        modifiedCr = Quantization.quantize(modifiedCr, blockSize, quantize, true);
+    }
+
+    public void inverseQuantize (double quantize, int blockSize){
+        modifiedRed = Helper.convertDoubleToInt(Quantization.inverseQuantize(Matrix.constructWithCopy(Helper.convertIntToDouble(modifiedRed)), blockSize, quantize,false).getArray());
+        modifiedBlue = Helper.convertDoubleToInt(Quantization.inverseQuantize(Matrix.constructWithCopy(Helper.convertIntToDouble(modifiedBlue)), blockSize, quantize,false).getArray());
+        modifiedGreen = Helper.convertDoubleToInt(Quantization.inverseQuantize(Matrix.constructWithCopy(Helper.convertIntToDouble(modifiedGreen)), blockSize, quantize,false).getArray());
+
+        modifiedCb = Quantization.inverseQuantize(modifiedCb, blockSize, quantize, true);
+        modifiedCr = Quantization.inverseQuantize(modifiedCr, blockSize, quantize, true);
     }
 }

@@ -6,11 +6,11 @@ import enums.TransformType;
 public class Transform {
 
     public static Matrix transform (Matrix input, TransformType type, int blockSize) {
-        return helperMethodMatrixOperations(input, type, blockSize, false);
+        return helperMatrixTransformOperations(input, type, blockSize, false);
     }
 
     public static Matrix inverseTransform (Matrix input, TransformType type, int blockSize) {
-        return helperMethodMatrixOperations(input, type, blockSize, true);
+        return helperMatrixTransformOperations(input, type, blockSize, true);
     }
 
     public static Matrix getTransformMatrix (TransformType type, int blockSize) {
@@ -50,7 +50,7 @@ public class Transform {
         return newMatrix;
     }
 
-    public static Matrix helperMethodMatrixOperations (Matrix input, TransformType type, int blockSize, boolean inverse) {
+    public static Matrix helperMatrixTransformOperations (Matrix input, TransformType type, int blockSize, boolean inverse) {
         Matrix returnMatrix = new Matrix(input.getRowDimension(), input.getColumnDimension());
         Matrix A = getTransformMatrix(type, blockSize);
         Matrix At = A.transpose();

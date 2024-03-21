@@ -24,43 +24,15 @@ public class Quantization {
             {99, 99, 99, 99, 99, 99, 99, 99}
     };
 
-    public static Matrix matrixVal = new Matrix(8,8).constructWithCopy(intMatrix);
-    public static Matrix matrixYval = new Matrix(8,8).constructWithCopy(intMatrixY);
+    public static Matrix matrixVal = Matrix.constructWithCopy(intMatrix);
+    public static Matrix matrixYval = Matrix.constructWithCopy(intMatrixY);
 
     public static Matrix quantize (Matrix input, int blockSize, double quality, boolean matrixY) {
-        Matrix quantizationMatrix = getQuantizationMatrix(blockSize, quality, matrixY);
-
-        Matrix returnMatrix = new Matrix(input.getRowDimension(), input.getColumnDimension());
-
-        for (int row = 0; row < input.getRowDimension(); row += blockSize) {
-            for (int col = 0; col < input.getColumnDimension(); col += blockSize) {
-                Matrix block = input.getMatrix(row,row + blockSize - 1, col, col + blockSize -1);
-
-                for (int rowBlock = 0; rowBlock < block.getRowDimension(); rowBlock ++) {
-                    for (int columnBlock =0; columnBlock < block.getColumnDimension(); columnBlock ++) {
-                        double value = block.get(rowBlock, columnBlock) / quantizationMatrix.get(rowBlock, columnBlock);
-                        block.set(rowBlock,columnBlock, value >= -0.2 && value <= 0.2 ? (double) Math.round(value*100)/100 : (double) Math.round(value*10)/10);
-                    }
-                }
-                returnMatrix.setMatrix(row,row + blockSize - 1, col, col + blockSize -1,block);
-            }
-        }
-        return returnMatrix;
+        return helperMethodMatrixQuantizationOperations(input, blockSize, quality, matrixY, true);
     }
 
     public static Matrix inverseQuantize (Matrix input, int blockSize, double quality, boolean matrixY) {
-        Matrix quantizationMatrix = getQuantizationMatrix(blockSize, quality, matrixY);
-
-        Matrix returnMatrix = new Matrix(input.getRowDimension(), input.getColumnDimension());
-
-        for (int row = 0; row < input.getRowDimension(); row += blockSize) {
-            for (int col = 0; col < input.getColumnDimension(); col += blockSize) {
-                Matrix block = input.getMatrix(row,row + blockSize - 1, col, col + blockSize -1);
-
-                returnMatrix.setMatrix(row,row + blockSize - 1, col, col + blockSize -1,block.arrayTimes(quantizationMatrix));
-            }
-        }
-        return returnMatrix;
+        return helperMethodMatrixQuantizationOperations(input, blockSize, quality, matrixY, false);
     }
 
     public static Matrix getQuantizationMatrix (int blockSize, double quality, boolean matrixY) {
@@ -69,39 +41,24 @@ public class Quantization {
         }
 
         Matrix returnMatrix;
-
         if (matrixY) {
             returnMatrix = matrixYval;
         } else {
             returnMatrix = matrixVal;
         }
 
-        if (blockSize != 8) {
-            switch (blockSize) {
-                case 4:
-                    returnMatrix = Sampling.downSample(returnMatrix);
-                    returnMatrix = returnMatrix.transpose();
-                    returnMatrix = Sampling.downSample(returnMatrix);
-                    returnMatrix = returnMatrix.transpose();
-                    break;
-                case 16:
-                    returnMatrix = Sampling.upSample(returnMatrix);
-                    returnMatrix = returnMatrix.transpose();
-                    returnMatrix = Sampling.upSample(returnMatrix);
-                    returnMatrix = returnMatrix.transpose();
-                    break;
-                case 32:
-                    returnMatrix = Sampling.upSample(returnMatrix);
-                    returnMatrix = returnMatrix.transpose();
-                    returnMatrix = Sampling.upSample(returnMatrix);
-                    returnMatrix = returnMatrix.transpose();
-                    returnMatrix = Sampling.upSample(returnMatrix);
-                    returnMatrix = returnMatrix.transpose();
-                    returnMatrix = Sampling.upSample(returnMatrix);
-                    returnMatrix = returnMatrix.transpose();
-                    break;
+        if (blockSize < 8) {
+            for (int i = 0; i < blockSize; i += 2){
+                returnMatrix = Sampling.downSample(returnMatrix);
+                returnMatrix = returnMatrix.transpose();
             }
-        }
+            } else if (blockSize > 8) {
+                for (int i = 8; i <= blockSize; i += 8) {
+                    returnMatrix = Sampling.upSample(returnMatrix);
+                    returnMatrix = returnMatrix.transpose();
+                }
+            }
+
         double alpha;
         if (quality < 50) {
             alpha = 50 / quality;
@@ -111,8 +68,26 @@ public class Quantization {
         return returnMatrix.times(alpha);
     }
 
-    public static Matrix helperMatrix(Matrix matrix, Matrix matrixToSet, int row, int column) {
-        matrix.setMatrix(row, matrixToSet.getRowDimension() + row,column,matrixToSet.getColumnDimension() + column, matrixToSet);
-        return matrix;
+    public static Matrix helperMethodMatrixQuantizationOperations(Matrix input, int blockSize, double quality, boolean matrixY, boolean quantize) {
+        Matrix quantizationMatrix = getQuantizationMatrix(blockSize, quality, matrixY);
+        Matrix returnMatrix = new Matrix(input.getRowDimension(), input.getColumnDimension());
+
+        for (int row = 0; row < input.getRowDimension(); row += blockSize) {
+            for (int col = 0; col < input.getColumnDimension(); col += blockSize) {
+                Matrix block = input.getMatrix(row,row + blockSize - 1, col, col + blockSize -1);
+                if (quantize) {
+                    for (int rowBlock = 0; rowBlock < block.getRowDimension(); rowBlock ++) {
+                        for (int columnBlock =0; columnBlock < block.getColumnDimension(); columnBlock ++) {
+                            double value = block.get(rowBlock, columnBlock) / quantizationMatrix.get(rowBlock, columnBlock);
+                            block.set(rowBlock,columnBlock, value >= -0.2 && value <= 0.2 ? (double) Math.round(value*100)/100 : (double) Math.round(value*10)/10);
+                        }
+                    }
+                } else {
+                    block = block.arrayTimes(quantizationMatrix);
+                }
+                returnMatrix.setMatrix(row,row + blockSize - 1, col, col + blockSize -1,block);
+            }
+        }
+        return returnMatrix;
     }
 }
