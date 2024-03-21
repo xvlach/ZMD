@@ -80,7 +80,7 @@ public class Sampling {
      * @param matrix Matrix YCbCr
      * @return Matrix YCbCr
      */
-    private static Matrix downSample(Matrix matrix) {
+    public static Matrix downSample(Matrix matrix) {
         int numbRows = matrix.getRowDimension();
         int numbColumns = matrix.getColumnDimension();
         double[][] newMatrix = new double[numbRows][numbColumns/2];

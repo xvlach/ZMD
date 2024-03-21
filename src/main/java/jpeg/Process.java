@@ -166,6 +166,7 @@ public class Process {
      * @param samplingType hodnota na kterou chceme samplovat
      */
     public void sampleDown (SamplingType samplingType) {
+        modifiedY = Sampling.sampleDown(modifiedY, samplingType);
         modifiedCb = Sampling.sampleDown(modifiedCb, samplingType);
         modifiedCr = Sampling.sampleDown(modifiedCr, samplingType);
     }
@@ -175,6 +176,7 @@ public class Process {
      * @param samplingType hodnota na kterou chceme samlovat
      */
     public void sampleUp (SamplingType samplingType) {
+        modifiedY = Sampling.sampleUp(modifiedY, samplingType);
         modifiedCb = Sampling.sampleUp(modifiedCb, samplingType);
         modifiedCr = Sampling.sampleUp(modifiedCr, samplingType);
     }
