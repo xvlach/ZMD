@@ -51,7 +51,7 @@ public class Process {
     /**
      * Naplnění matic barvama
      */
-    private void setOriginalRGB(){
+    private void setOriginalRGB() {
         for(int h = 0; h < imageHeight; h++){
             for (int w = 0; w < imageWidth; w++){
                 Color color = new Color(originalImage.getRGB(w,h));
@@ -66,12 +66,12 @@ public class Process {
      * Zobrazení obrázku
      * @return Vraci obrazek
      */
-    public BufferedImage getImageFromRGB(){
+    public BufferedImage getImageFromRGB() {
         BufferedImage bfImage = new BufferedImage(
-                imageWidth, imageHeight,
+                modifiedRed[0].length, modifiedRed.length,
                 BufferedImage.TYPE_INT_RGB);
-        for(int h = 0; h < imageHeight; h++){
-            for (int w = 0; w < imageWidth; w++) {
+        for(int h = 0; h < modifiedRed.length; h++){
+            for (int w = 0; w < modifiedRed[0].length; w++) {
                 bfImage.setRGB(w,h,
                         (new Color(modifiedRed[h][w],
                                 modifiedGreen[h][w],
@@ -87,12 +87,11 @@ public class Process {
      * @param type Barva podle enumu
      * @return Vrací obrazek
      */
-    public BufferedImage showOneColorImageFromRGB(int[][] color, enums.ColorType type)
-    {
-        BufferedImage bfImage = new BufferedImage(
-                imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
-        for (int h = 0; h < imageHeight; h++) {
-            for (int w = 0; w < imageWidth; w++) {
+    public BufferedImage showOneColorImageFromRGB(int[][] color, enums.ColorType type) {
+        BufferedImage bfImage = new BufferedImage(color[0].length, color.length, BufferedImage.TYPE_INT_RGB);
+
+        for (int h = 0; h < color.length; h++) {
+            for (int w = 0; w < color[0].length; w++) {
                 switch (type) {
                     case RED:
                         bfImage.setRGB(w, h, (new Color(color[h][w], 0, 0)).getRGB());
@@ -116,21 +115,14 @@ public class Process {
      * @param color Matice barvy
      * @return Vrací obrazek
      */
-    public BufferedImage showOneColorImageFromYCbCr(Matrix color)
-    {
+    public BufferedImage showOneColorImageFromYCbCr(Matrix color) {
+        BufferedImage bfImage = new BufferedImage(color.getColumnDimension(), color.getRowDimension(), BufferedImage.TYPE_INT_RGB);
 
-        int width = Helper.GetWidth(color);
-        int height = Helper.GetHeight(color);
-
-        BufferedImage bfImage = new BufferedImage(
-                width, height,
-                BufferedImage.TYPE_INT_RGB);
-        for(int h = 0; h < height; h++){
-            for (int w = 0; w < width; w++) {
-                bfImage.setRGB(w,h,
-                        (new Color(Helper.roundRange(color.get(h,w)),
-                                Helper.roundRange(color.get(h,w)) ,
-                                Helper.roundRange(color.get(h,w))).getRGB()));
+        for(int h = 0; h < color.getRowDimension(); h++){
+            for (int w = 0; w < color.getColumnDimension(); w++) {
+                int colorToSet = Helper.roundRange(color.get(h,w));
+                //int colorToSet = (int) Math.round(color.get(h,w));
+                bfImage.setRGB(w, h, (new Color(colorToSet, colorToSet, colorToSet)).getRGB());
             }
         }
         return bfImage;

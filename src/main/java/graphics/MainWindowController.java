@@ -347,7 +347,7 @@ public class MainWindowController implements Initializable {
     @FXML
     public void showCbOriginal(ActionEvent event) {
         try {
-            Dialogs.showImageInWindow(process.showOrigY(), "Original Cb", true);
+            Dialogs.showImageInWindow(process.showOrigCb(), "Original Cb", true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -1,6 +1,7 @@
 package jpeg;
 
 import Jama.Matrix;
+import core.Helper;
 
 public class ColorTransform {
 
@@ -36,27 +37,24 @@ public class ColorTransform {
      * @return Pole poli RGB
      */
     public static int[][][] convertModifiedYcBcRtoRGB(Matrix Y, Matrix Cb, Matrix Cr){
-        int[][] convertedRed = new int[Y.getColumnDimension()][Y.getRowDimension()];
-        int[][] convertedGreen = new int[Y.getColumnDimension()][Y.getRowDimension()];;
-        int[][] convertedBlue = new int[Y.getColumnDimension()][Y.getRowDimension()];;
+        int[][] convertedRed = new int[Y.getRowDimension()][Y.getColumnDimension()];
+        int[][] convertedGreen = new int[Y.getRowDimension()][Y.getColumnDimension()];;
+        int[][] convertedBlue = new int[Y.getRowDimension()][Y.getColumnDimension()];;
 
-        for (int i = 0; i < Y.getColumnDimension(); i++) {
-            for (int j = 0; j < Y.getRowDimension(); j++) {
-                int red = Math.round((float)(1.164*(Y.get(i,j)-16) + 1.596*(Cr.get(i,j)-128)));
-                red = red > 255 ? 255 : red;
-                red = red < 0 ? 0 : red;
+        for (int row = 0; row < Y.getRowDimension(); row++) {
+            for (int column = 0; column < Y.getColumnDimension(); column++) {
+                int red = Math.round((float)(1.164*(Y.get(row, column)-16) + 1.596*(Cr.get(row, column)-128)));
+                red = Helper.roundRange(red);
 
-                int green = Math.round((float)((1.164*(Y.get(i,j) - 16) - 0.813*(Cr.get(i,j)-128)) - 0.391*(Cb.get(i,j) -128)));
-                green = green > 255 ? 255 : green;
-                green = green < 0 ? 0 : green;
+                int green = Math.round((float)((1.164*(Y.get(row, column) - 16) - 0.813*(Cr.get(row, column)-128)) - 0.391*(Cb.get(row, column) -128)));
+                green = Helper.roundRange(green);
 
-                int blue = Math.round((float)(1.164*(Y.get(i,j) -16) + 2.018*(Cb.get(i,j)-128)));
-                blue = blue > 255 ? 255 : blue;
-                blue = blue < 0 ? 0 : blue;
+                int blue = Math.round((float)(1.164*(Y.get(row, column) -16) + 2.018*(Cb.get(row, column)-128)));
+                blue = Helper.roundRange(blue);
 
-                convertedRed[i][j] = red;
-                convertedGreen[i][j] = green;
-                convertedBlue[i][j] = blue;
+                convertedRed[row][column] = red;
+                convertedGreen[row][column] = green;
+                convertedBlue[row][column] = blue;
             }
         }
         return new int[][][]{convertedRed, convertedGreen, convertedBlue};
